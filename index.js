@@ -2,7 +2,7 @@
 
 // Never use 0 as the minimum value, or anywhere in the range, as it will be ignored by the keyboard
 const MIN_HUE_VALUE = 1;
-const MAX_HUE_VALUE = 85;
+const MAX_HUE_VALUE = 70;
 
 // define constants
 const KEYBOARD_UPDATE_TIME = 5000; // time in milliseconds
