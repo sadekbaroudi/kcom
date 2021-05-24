@@ -17,11 +17,12 @@ module.exports = {
     enigma36: {
         vendorId: 65278,
         productId: 23499,
+        usagePage: 65376,
         numberOfLeds: 12,
-    	cpuLeds: [],
+    	cpuLeds: [0,1,2,3],
     	diskLeds: [],
-    	memoryLeds: [],
-    	stockLeds: [0,1,2,3,4,5,6,7,8,9,10,11]
+    	memoryLeds: [4,5,6,7],
+    	stockLeds: [8,9,10,11]
     },
     reviung41: {
         numberOfLeds: 11,
