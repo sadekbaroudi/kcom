@@ -208,6 +208,14 @@ async function sendToKeyboard(screen) {
             finalData[val] = convertValuesToHSVData(key, dataToWrite[key]);
             // console.log('key val: ', val);
         }
+
+        // Do one loop through in case there are any uninitialized values, and set them to 0
+        // This prevents errors when sending the data, and 0 is the default value, which means 'do not change the led color'
+        for(var i = 0; i < keyboardList[`${keyboardName}`]['numberOfLeds']; i++) {
+            if(!finalData[i]) {
+                finalData[i] = 0;
+            }
+        }
     };
 
     console.log('finalData: ', finalData);
