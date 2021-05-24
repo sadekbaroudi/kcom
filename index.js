@@ -3,6 +3,9 @@
 // Never use 0 as the minimum value, or anywhere in the range, as it will be ignored by the keyboard
 const MIN_HUE_VALUE = 1;
 const MAX_HUE_VALUE = 70;
+// This is the plus or minus range to apply the stock modifier. 
+// So, if the value is 2, then -2% for the day would be the max "bad" value, and +2% would be the max "good" value
+const STOCK_PLUS_OR_MINUS = 2;
 
 // define constants
 const KEYBOARD_UPDATE_TIME = 5000; // time in milliseconds
@@ -160,7 +163,7 @@ async function startStockMonitor() {
                   modules: [ 'price', 'summaryDetail' ] // see the docs for the full list
                 }, function (err, quotes) {
                   // console.log(quotes); // To see the entire result
-                  stocks.set(key, quotes.price.regularMarketChangePercent);
+                  stocks.set(key, (quotes.price.regularMarketChangePercent * 100)); // * 100 so it is in percent, yahoo APIs report 5% as 0.05
                   resolve();
                 });
             }));
@@ -255,15 +258,15 @@ function convertMemoryValuesToHSVData(data) {
 }
 
 function convertStockValuesToHSVData(data) {
-    if (data > 5) {
-        data = 5;
+    if (data > STOCK_PLUS_OR_MINUS) {
+        data = STOCK_PLUS_OR_MINUS;
     }
-    if (data < -5) {
-        data = -5;
+    if (data < (-1 * STOCK_PLUS_OR_MINUS)) {
+        data = (-1 * STOCK_PLUS_OR_MINUS);
     }
 
-    var normalizedValue = data + 5;
-    var effectiveMaxPercent = 10;
+    var normalizedValue = data + STOCK_PLUS_OR_MINUS;
+    var effectiveMaxPercent = STOCK_PLUS_OR_MINUS * 2;
 
     return Math.round(applyHueModifier(normalizedValue / effectiveMaxPercent));
 }
