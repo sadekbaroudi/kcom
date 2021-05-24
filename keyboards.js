@@ -4,10 +4,10 @@ module.exports = {
         productId: 23384,
         usagePage: 65376,
         numberOfLeds: 13,
-        cpuLeds: [5,6],
+        cpuLeds: [1,4,5,6],
         diskLeds: [],
-        memoryLeds: [7,8],
-        stockLeds: [9,10]
+        memoryLeds: [0,3,7,8,12],
+        stockLeds: [2,9,10,11]
         // Use this code to run against the top 3 leds
     	// cpuLeds: [0],
     	// diskLeds: [],
