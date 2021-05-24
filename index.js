@@ -7,6 +7,12 @@ const MAX_HUE_VALUE = 70;
 // So, if the value is 2, then -2% for the day would be the max "bad" value, and +2% would be the max "good" value
 const STOCK_PLUS_OR_MINUS = 2;
 
+// The tendency is that it does not favor or demonstrate the extremes. By using an exponential, you are favoring a lower value (since the range is 0 to 1)
+// The higher the exponential below, the more you favor showing lower values.
+// If you make it 1, it is shown linearly.
+// If you make it a value between 0 and 1, you are favoring showing higher values
+const HUE_EXPONENTIAL = 1.8;
+
 // define constants
 const KEYBOARD_UPDATE_TIME = 5000; // time in milliseconds
 
@@ -271,8 +277,12 @@ function applyHueModifier(percentOfMax) {
     return (percentOfMax * (MAX_HUE_VALUE - MIN_HUE_VALUE)) + MIN_HUE_VALUE;
 }
 
+function applyExponentModifier(value) {
+    return Math.pow(value, HUE_EXPONENTIAL);
+}
+
 function convertMemoryValuesToHSVData(data) {
-    return Math.round(applyHueModifier(data / 100));
+    return Math.round(applyHueModifier(applyExponentModifier(data / 100)));
 }
 
 function convertStockValuesToHSVData(data) {
@@ -286,15 +296,16 @@ function convertStockValuesToHSVData(data) {
     var normalizedValue = data + STOCK_PLUS_OR_MINUS;
     var effectiveMaxPercent = STOCK_PLUS_OR_MINUS * 2;
 
-    return Math.round(applyHueModifier(normalizedValue / effectiveMaxPercent));
+    return Math.round(applyHueModifier(applyExponentModifier(normalizedValue / effectiveMaxPercent)));
 }
 
 function convertCpuValuesToHSVData(data) {
-    return Math.round(applyHueModifier(data / 100));
+    return Math.round(applyHueModifier(applyExponentModifier(data / 100)));
 }
 
 function convertNetworkValuesToHSVData(data) {
-    return '';
+    // Hardcoded, since this is not in use at all right now. Calculate appropriately if I ever add this feature
+    return Math.round(applyHueModifier(applyExponentModifier(0.5)));
 }
 
 // Start the monitors that collect the info to display
