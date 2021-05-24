@@ -46,23 +46,12 @@ console.log('selected keyboard: ', keyboardName);
 console.log('vendorId', keyboardList[keyboardName].vendorId);
 console.log('productId', keyboardList[keyboardName].productId);
 
-// Load the device 
-var devices = hid.devices();
-var deviceInfo = devices.find( function (d) {
-    return d.vendorId === keyboardList[keyboardName].vendorId && d.productId === keyboardList[keyboardName].productId
-        && d.usagePage === keyboardList[keyboardName].usagePage
-})
 
-// Verify we can find the appropriate keyboard
-if (!deviceInfo) {
-    console.log('Could not find keyboard, exiting');
+var device = getKeyboardDevice();
+if (!device) {
+    console.log('No device, exiting');
     process.exit();
 }
-console.log('deviceInfo \n', deviceInfo);
-
-// Establish a connection to the device for communication
-var device = new hid.HID(deviceInfo.path);
-
 console.log(hid.devices());
 
 console.log("device: \n", device);
@@ -98,6 +87,26 @@ function wait(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     })
+}
+
+function getKeyboardDevice() {
+    // Load the device 
+    var devices = hid.devices();
+    var deviceInfo = devices.find( function (d) {
+        return d.vendorId === keyboardList[keyboardName].vendorId && d.productId === keyboardList[keyboardName].productId
+            && d.usagePage === keyboardList[keyboardName].usagePage
+    })
+
+    // Verify we can find the appropriate keyboard
+    if (!deviceInfo) {
+        console.log('Could not find keyboard when trying to connect');
+    }
+    console.log('deviceInfo \n', deviceInfo);
+
+    // Establish a connection to the device for communication
+    var device = new hid.HID(deviceInfo.path);
+
+    return device;
 }
 
 const dataToWrite = [];
@@ -226,7 +235,16 @@ async function sendToKeyboard(screen) {
     dataToWritePrevious = dataToWrite;
 
     finalData.unshift(0x00);
-    device.write(finalData);
+    try {
+        device.write(finalData);
+    } catch (e) {
+        device = getKeyboardDevice();
+        console.log("could not write to device, trying to reconnect");
+    } finally {
+        if(!device) {
+            console.log("failed to reconnect");
+        }
+    }
 }
 
 function convertValuesToHSVData(key, data) {
