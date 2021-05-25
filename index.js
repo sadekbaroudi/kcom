@@ -11,7 +11,7 @@ const STOCK_PLUS_OR_MINUS = 2;
 // The higher the exponential below, the more you favor showing lower values.
 // If you make it 1, it is shown linearly.
 // If you make it a value between 0 and 1, you are favoring showing higher values
-const HUE_EXPONENTIAL = 1.8;
+const HUE_EXPONENTIAL = 1.5;
 
 // define constants
 const KEYBOARD_UPDATE_TIME = 5000; // time in milliseconds
