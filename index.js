@@ -2,7 +2,7 @@
 
 // Never use 0 as the minimum value, or anywhere in the range, as it will be ignored by the keyboard
 const MIN_HUE_VALUE = 169;
-const MAX_HUE_VALUE = 255;
+const MAX_HUE_VALUE = 254;
 // This is the plus or minus range to apply the stock modifier. 
 // So, if the value is 2, then -2% for the day would be the max "bad" value, and +2% would be the max "good" value
 const STOCK_PLUS_OR_MINUS = 2;
