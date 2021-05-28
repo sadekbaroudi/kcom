@@ -1,8 +1,8 @@
 'use strict';
 
 // Never use 0 as the minimum value, or anywhere in the range, as it will be ignored by the keyboard
-const MIN_HUE_VALUE = 1;
-const MAX_HUE_VALUE = 70;
+const MIN_HUE_VALUE = 169;
+const MAX_HUE_VALUE = 255;
 // This is the plus or minus range to apply the stock modifier. 
 // So, if the value is 2, then -2% for the day would be the max "bad" value, and +2% would be the max "good" value
 const STOCK_PLUS_OR_MINUS = 2;
@@ -11,7 +11,10 @@ const STOCK_PLUS_OR_MINUS = 2;
 // The higher the exponential below, the more you favor showing lower values.
 // If you make it 1, it is shown linearly.
 // If you make it a value between 0 and 1, you are favoring showing higher values
-const HUE_EXPONENTIAL = 1.3;
+const HUE_EXPONENTIAL = 0.7;
+
+// If you want the positive/negative to be the inverse (for the purposes of the color range), set this to true
+const INVERT_RANGE = true;
 
 // define constants
 const KEYBOARD_UPDATE_TIME = 5000; // time in milliseconds
@@ -254,23 +257,37 @@ async function sendToKeyboard(screen) {
 }
 
 function convertValuesToHSVData(key, data) {
+    let normalizedData = null;
     switch (key) {
         case 'memoryLeds':
-            return convertMemoryValuesToHSVData(data);
+            normalizedData = convertMemoryValuesToNormalizedData(data);
             break;
         case 'stockLeds':
-            return convertStockValuesToHSVData(data);
+            normalizedData = convertStockValuesToNormalizedData(data);
             break;
         case 'cpuLeds':
-            return convertCpuValuesToHSVData(data);
+            normalizedData = convertCpuValuesToNormalizedData(data);
             break;
         case 'networkLeds':
-            return convertNetworkValuesToHSVData(data);
+            normalizedData = convertNetworkValuesToNormalizedData(data);
             break;
         default:
             console.log('convertValuesToHSVData: bad key value: ', key, '\n');
             break;
     }
+
+    if (!normalizedData) {
+        return null;
+    }
+
+    return convertDataToHSVData(normalizedData);
+}
+
+function convertDataToHSVData(data) {
+    if (INVERT_RANGE) {
+        data = 1 - data;
+    }
+    return Math.round(applyHueModifier(data));
 }
 
 function applyHueModifier(percentOfMax) {
@@ -281,11 +298,11 @@ function applyExponentModifier(value) {
     return Math.pow(value, HUE_EXPONENTIAL);
 }
 
-function convertMemoryValuesToHSVData(data) {
-    return Math.round(applyHueModifier(applyExponentModifier(data / 100)));
+function convertMemoryValuesToNormalizedData(data) {
+    return applyExponentModifier(data / 100);
 }
 
-function convertStockValuesToHSVData(data) {
+function convertStockValuesToNormalizedData(data) {
     if (data > STOCK_PLUS_OR_MINUS) {
         data = STOCK_PLUS_OR_MINUS;
     }
@@ -296,16 +313,16 @@ function convertStockValuesToHSVData(data) {
     var normalizedValue = data + STOCK_PLUS_OR_MINUS;
     var effectiveMaxPercent = STOCK_PLUS_OR_MINUS * 2;
 
-    return Math.round(applyHueModifier(applyExponentModifier(normalizedValue / effectiveMaxPercent)));
+    return applyExponentModifier(normalizedValue / effectiveMaxPercent);
 }
 
-function convertCpuValuesToHSVData(data) {
-    return Math.round(applyHueModifier(applyExponentModifier(data / 100)));
+function convertCpuValuesToNormalizedData(data) {
+    return applyExponentModifier(data / 100);
 }
 
-function convertNetworkValuesToHSVData(data) {
+function convertNetworkValuesToNormalizedData(data) {
     // Hardcoded, since this is not in use at all right now. Calculate appropriately if I ever add this feature
-    return Math.round(applyHueModifier(applyExponentModifier(0.5)));
+    return applyExponentModifier(0.5);
 }
 
 // Start the monitors that collect the info to display
