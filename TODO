@@ -1,0 +1,4 @@
+TODO
+
+* 32 is the max number of bytes you can send to the keyboard in one message via the HID. Right now, if there are more than 32 leds, you cannot accommodate.
+	* So, update the code to support sending the LED index along with the value. This will double the size of the messages, which means you can only accommodate 16 LEDs per message. But, you can now send multiple messages and therefore handle more than 32 LEDs. You can accommodate unlimited, though there is latency between each message. So, if there are too many, you many notice it.
